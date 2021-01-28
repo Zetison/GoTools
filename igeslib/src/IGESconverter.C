@@ -1038,9 +1038,21 @@ void IGESconverter::writego(ostream& os)
 	    colour.push_back(255);
 	    colour.push_back(255);
 	}
-	ObjectHeader local_header(class_type, major, minor, colour);
-	local_header.write(os);
-	object->write(os);
+    if (class_type == Class_BoundedCurve) {
+      SplineCurve* lin = static_cast<BoundedCurve*>(object.get())->geometryCurve();
+      ObjectHeader local_header(Class_SplineCurve, major, minor, colour);
+      local_header.write(os);
+      lin->write(os);
+    } else if (class_type == Class_BoundedSurface) {
+      SplineSurface* lin = static_cast<BoundedSurface*>(object.get())->getSplineSurface();
+      ObjectHeader local_header(Class_SplineSurface, major, minor, colour);
+      local_header.write(os);
+      lin->write(os);
+    } else {
+      ObjectHeader local_header(class_type, major, minor, colour);
+      local_header.write(os);
+      object->write(os);
+    }
     }
 }
 
